@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Summer Xu · 徐琦然 — Creator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html, body, #root { background: #0C0C0C; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Kanit', sans-serif; color: #D7E2EA; }
+    .hero-heading { background: linear-gradient(180deg, #646973 0%, #BBCCD7 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+    .overflow-x-clip { overflow-x: clip; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .fade { opacity: 0; transform: translateY(30px); transition: opacity .7s cubic-bezier(.25,.1,.25,1), transform .7s cubic-bezier(.25,.1,.25,1); }
+    .fade.in { opacity: 1; transform: translateY(0); }
+    .magnet { will-change: transform; transition: transform .3s ease-out; }
+    .contact-btn { background: linear-gradient(123deg, #18011F 7%, #B600A8 37%, #7621B0 72%, #BE4C00 100%); box-shadow: 0px 4px 4px rgba(181,1,167,.25), 4px 4px 12px #7721B1 inset; outline: 2px solid #fff; outline-offset: -3px; }
+    .ghost-btn { border: 2px solid #D7E2EA; }
+    .ghost-btn:hover { background: rgba(215,226,234,.1); }
+    .ch { opacity: .2; }
+    .edu { display:inline-block; margin-top:clamp(28px,4vw,46px); padding:clamp(18px,3vw,26px) clamp(26px,5vw,44px); border:1px solid rgba(183,0,168,.32); border-radius:18px; background:rgba(183,0,168,.07); box-shadow:0 12px 34px rgba(0,0,0,.38); text-align:center; }
+    .edu__label { font-size:11px; letter-spacing:.34em; text-transform:uppercase; color:#D7E2EA; opacity:.78; margin-bottom:12px; font-weight:600; }
+    .edu__school { background:linear-gradient(180deg,#646973 0%,#BBCCD7 100%); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; font-weight:800; font-size:clamp(1.5rem,3.4vw,2.5rem); line-height:1.1; }
+    .edu__major { margin-top:10px; color:#D7E2EA; font-weight:500; letter-spacing:.04em; font-size:clamp(.95rem,1.8vw,1.15rem); }
+  </style>
+</head>
+<body class="overflow-y-auto">
+  <button id="LangBtn" class="fixed top-4 right-4 z-50 px-4 py-2 rounded-full border border-[#D7E2EA]/40 bg-black/50 text-[#D7E2EA] text-sm uppercase tracking-widest hover:bg-[#D7E2EA]/10 transition">EN / 中</button>
+
+  <!-- HERO -->
+  <section class="hero relative h-screen flex flex-col overflow-x-clip" style="height:100vh">
+    <h1 class="fade hero-heading relative z-10 font-black uppercase tracking-tight leading-none whitespace-nowrap w-full overflow-hidden pt-2 sm:pt-3 md:pt-4 text-[8vw] sm:text-[8.5vw] md:text-[9vw] lg:text-[9.6vw] text-center pointer-events-none" style="position:relative;z-index:10">Hi, I&apos;m Summer Xu</h1>
+
+    <div class="fade relative z-10 flex flex-wrap justify-center gap-5 md:gap-9 mt-4 md:mt-6 text-sm md:text-lg font-medium uppercase tracking-wider pointer-events-none" style="position:relative;z-index:10">
+      <a href="#about" data-i18n="navAbout" class="hover:opacity-70 transition-opacity duration-200 pointer-events-auto">About</a>
+      <a href="#services" data-i18n="navServices" class="hover:opacity-70 transition-opacity duration-200 pointer-events-auto">Services</a>
+      <a href="#projects" data-i18n="navProjects" class="hover:opacity-70 transition-opacity duration-200 pointer-events-auto">Projects</a>
+      <a href="#contact" data-i18n="navContact" class="hover:opacity-70 transition-opacity duration-200 pointer-events-auto">Contact</a>
+    </div>
+
+    <!-- portrait (透明抠图，全屏幕人像) -->
+    <canvas id="globeCanvas" style="position:absolute;inset:0;width:100%;height:100%;z-index:0"></canvas>
+
+    <div class="fade relative z-10 mt-auto flex justify-between items-end pb-7 sm:pb-8 md:pb-10 px-6 md:px-10">
+      <p class="text-[#D7E2EA] font-light uppercase tracking-wide leading-snug max-w-[160px] sm:max-w-[220px] md:max-w-[260px] pointer-events-none" style="font-size:clamp(.75rem,1.4vw,1.5rem)" data-i18n="heroSub">a photo &amp; video creator crafting striking, unforgettable stories across platforms</p>
+      <a id="heroContact" href="#photography" data-i18n="heroContact" class="magnet contact-btn text-white font-medium uppercase tracking-widest px-8 py-3 sm:px-10 sm:py-3.5 text-xs sm:text-sm md:text-base">View Works</a>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <section id="marquee" class="bg-[#0C0C0C] pt-24 sm:pt-32 md:pt-40 pb-10">
+    <div class="row1 flex gap-3 overflow-hidden will-change-transform">
+      <!-- images injected -->
+    </div>
+    <div class="row2 flex gap-3 overflow-hidden will-change-transform mt-3 gap-3">
+      <!-- images injected -->
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="relative min-h-screen flex flex-col items-center justify-center px-5 sm:px-8 md:px-10 py-20">
+    <img class="fade absolute top-[4%] left-[1%] sm:left-[2%] md:left-[4%] w-[110px] sm:w-[150px] md:w-[200px] rounded-2xl object-cover" src="images/landing/about1.jpg" alt="deco">
+    <img class="fade absolute bottom-[8%] left-[3%] sm:left-[6%] md:left-[10%] w-[90px] sm:w-[130px] md:w-[170px] rounded-2xl object-cover" src="images/landing/about2.jpg" alt="deco">
+    <img class="fade absolute top-[4%] right-[1%] sm:right-[2%] md:right-[4%] w-[110px] sm:w-[150px] md:w-[200px] rounded-2xl object-cover" src="images/landing/about3.jpg" alt="deco">
+    <img class="fade absolute bottom-[8%] right-[3%] sm:right-[6%] md:right-[10%] w-[120px] sm:w-[160px] md:w-[210px] rounded-2xl object-cover" src="images/landing/about4.jpg" alt="deco">
+
+    <h2 class="fade hero-heading font-black uppercase leading-none tracking-tight text-center" style="font-size:clamp(3rem,12vw,160px)" data-i18n="aboutTitle">About me</h2>
+    <div class="mt-10 sm:mt-14 md:mt-16"></div>
+    <p id="anim" class="text-[#D7E2EA] font-medium text-center leading-relaxed max-w-[560px]" style="font-size:clamp(1rem,2vw,1.35rem)">With five years of experience in content creation and fan-community marketing, I focus on photojournalism, video editing, color grading, and full-platform operations. I truly enjoy turning real stories into striking images and bringing brands to life. Let's build something incredible together!</p>
+    <div class="edu fade">
+      <div class="edu__label" data-i18n="eduLabel">🎓 学历 · Education</div>
+      <div class="edu__school" data-i18n="eduSchool">伦敦艺术大学</div>
+      <div class="edu__major" data-i18n="eduMajor">纪实摄影与新闻摄影专业 · 辅修电影</div>
+    </div>
+    <div class="mt-14 sm:mt-16 md:mt-20"></div>
+    <a href="#contact" class="magnet contact-btn text-white font-medium uppercase tracking-widest px-8 py-3 sm:px-10 sm:py-3.5 text-xs sm:text-sm md:text-base">Contact Me</a>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="services" class="bg-white text-[#0C0C0C] rounded-t-[40px] sm:rounded-t-[50px] md:rounded-t-[60px] px-5 sm:px-8 md:px-10 py-20 sm:py-24 md:py-32">
+    <h2 class="text-[#0C0C0C] font-black uppercase text-center mb-16 sm:mb-20 md:mb-28" style="font-size:clamp(3rem,12vw,160px)" data-i18n="servicesTitle">Services</h2>
+    <div id="svc" class="max-w-5xl mx-auto"></div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects" class="bg-[#0C0C0C] rounded-t-[40px] sm:rounded-t-[50px] md:rounded-t-[60px] -mt-10 sm:-mt-12 md:-mt-14 z-10 px-5 sm:px-8 md:px-10 pt-20 sm:pt-24 md:pt-28">
+    <h2 class="hero-heading font-black uppercase leading-none tracking-tight text-center mb-12" style="font-size:clamp(3rem,12vw,160px)" data-i18n="projectsTitle">Projects</h2>
+    <div id="stack" class="relative max-w-[1400px] mx-auto"></div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="bg-[#0C0C0C] min-h-[60vh] flex flex-col items-center justify-center px-6 py-24 text-center">
+    <p class="hero-heading font-black uppercase leading-none tracking-tight mb-8" style="font-size:clamp(2.4rem,9vw,120px)" data-i18n="contactTitle">Let&apos;s talk</p>
+    <p class="text-[#D7E2EA] font-light uppercase tracking-wide max-w-xl mb-8" style="font-size:clamp(1rem,2vw,1.4rem)" data-i18n="contactName">Summer Xu · 徐琦然</p>
+    <a href="mailto:1226819716@qq.com" class="contact-btn text-white font-medium uppercase tracking-widest px-8 py-3 sm:px-10 sm:py-3.5 text-xs sm:text-sm md:text-base">1226819716@qq.com</a>
+    <p class="mt-6 text-[#D7E2EA]/60 text-sm md:text-base">+86 132 8132 7813</p>
+    <div class="mt-8 flex flex-wrap gap-4 justify-center">
+      <a href="https://space.bilibili.com/25897119" target="_blank" rel="noopener" class="ghost-btn rounded-full px-6 py-2 text-sm uppercase tracking-widest">B站</a>
+      <a href="https://xhslink.cn/o/3Dbxb5fQph7" target="_blank" rel="noopener" class="ghost-btn rounded-full px-6 py-2 text-sm uppercase tracking-widest">小红书</a>
+      <a href="https://v.douyin.com/-KWVa6WelIA/" target="_blank" rel="noopener" class="ghost-btn rounded-full px-6 py-2 text-sm uppercase tracking-widest">抖音</a>
+      <a href="https://x.com/summerxu490729" target="_blank" rel="noopener" class="ghost-btn rounded-full px-6 py-2 text-sm uppercase tracking-widest">X</a>
+    </div>
+  </section>
+
+  <footer class="bg-[#0C0C0C] text-center pb-10 text-[#D7E2EA]/40 text-xs" data-i18n="foot">© 徐琦然 Summer Xu · 保留所有权利</footer>
+
+  <script src="js/three.min.js"></script>
+  <script src="data/places.js"></script>
+  <script src="data/borders.js"></script>
+  <script src="js/globe.js"></script>
+  <script>
+    let lang = (new URLSearchParams(location.search).get('lang')||'zh');
+    const STR={zh:{heroSub:'一个用镜头与光影讲故事的照片与视频创作者',heroContact:'观看作品',slideHint:'左右滑动查看作品 · 4个平台 / 外网X',navAbout:'关于',navServices:'服务',navProjects:'作品',navContact:'联系',aboutTitle:'关于我',servicesTitle:'服务',projectsTitle:'作品',contactTitle:'来聊聊',contactName:'Summer Xu · 徐琦然',statB:'B站 播放',statW:'微博 播放',statD:'抖音 单条最高',statT:'全矩阵累计',foot:'© 徐琦然 Summer Xu · 保留所有权利',live:'观看作品',openPlatform:'打开平台 ↗',tapPhone:'点击手机直达',catPersonal:'个人',catClient:'客户',catFounder:'创始人' ,catFan:'生贺剪辑',catAct:'影视人物向',catDrama:'剧情二创',catStage:'舞台',catEvent:'活动记录',wxChannels:'视频号 · WeChat Channels',weibo:'微博 · Weibo',editTitle:'视频剪辑 · Edit',official:'@Summer Xu · 官方推广',aboutText:'五年深耕内容创作与粉丝经济营销，专注纪实摄影、视频剪辑、调色包装与全平台运营。我热爱把真实故事变成动人的画面，也喜欢帮助品牌把故事讲得高级。让我们一起创造些了不起的东西吧！',eduLabel:'🎓 学历 · Education',eduSchool:'伦敦艺术大学',eduMajor:'纪实摄影与新闻摄影专业 · 辅修电影'},
+      en:{heroSub:'a photo & video creator crafting striking, unforgettable stories across platforms',heroContact:'View Works',slideHint:'Swipe left / right · 4 platforms incl. X',navAbout:'About',navServices:'Services',navProjects:'Projects',navContact:'Contact',aboutTitle:'About me',servicesTitle:'Services',projectsTitle:'Projects',contactTitle:'Let\'s talk',contactName:'Summer Xu · 徐琦然',statB:'Bilibili views',statW:'Weibo views',statD:'Douyin top video',statT:'Total matrix',foot:'© Summer Xu · All Rights Reserved',live:'Live Project',openPlatform:'Open platform ↗',tapPhone:'Tap a phone to visit',catPersonal:'Personal',catClient:'Client',catFounder:'Founder',catFan:'Birthday Edit',catAct:'Character Edit',catDrama:'Story Remix',catStage:'Stage',catEvent:'Event Record',wxChannels:'Video · WeChat Channels',weibo:'Weibo',editTitle:'Video Edit',official:'@Summer Xu · Official',aboutText:'With five years of experience in content creation and fan-community marketing, I focus on photojournalism, video editing, color grading, and full-platform operations. I truly enjoy turning real stories into striking images and bringing brands to life. Let\'s build something incredible together!',eduLabel:'🎓 Education',eduSchool:'University of the Arts London',eduMajor:'Documentary & Photojournalism · Minor in Film'}};
+    const T = k => (STR[lang] && STR[lang][k]) || k;
+    const SV={zh:[{n:'01',name:'摄影纪实 · Photography',d:'纪实与新闻摄影，用镜头捕捉真实而动人的瞬间，讲述有温度的故事。'},{n:'02',name:'视频剪辑 · Video Editing',d:'B站/抖音/小红书短视频全流程剪辑，节奏与叙事适配各平台传播特性。'},{n:'03',name:'后期制作 · Color & Post',d:'熟练运用达芬奇、PR、剪映、PS完成调色、动效包装、平面修图与成片，电影感画面质感。'},{n:'04',name:'全平台运营 · Platform Ops',d:'5年粉丝经济与圈层营销，从0到1冷启动，打造千万级曝光矩阵；深耕B站/微博/小红书/抖音，并运营外网X(@summerxu490729)，海内外全网覆盖、圈层渗透与用户沉淀。'},{n:'05',name:'善用AI · AI Creative',d:'深度运用AI辅助创作——从脚本、剪辑、调色到图文与视觉延展，全流程借力AI，把创意更快、更稳地落地成片。'},{n:'06',name:'多国文化 · Multicultural',d:'熟悉中国、日本、泰国、英国多国文化语境，深耕泰国影视圈层与海内外年轻受众；英语流利，跨文化沟通与内容适配游刃有余。'}],
+      en:[{n:'01',name:'Photography · Photojournalism',d:'Documentary & news photography that captures real, moving moments and tells stories with warmth.'},{n:'02',name:'Video Editing',d:'Full-pipeline short-video editing for Bilibili, Douyin & Red — pacing & narrative tuned per platform.'},{n:'03',name:'Color & Post',d:'DaVinci, Premiere, CapCut & Photoshop for grading, motion graphics, retouch and finishing — cinematic quality.'},{n:'04',name:'Platform Ops · incl. X',d:'5 years in fan-economy & niche marketing — cold-starting accounts from zero, building 10M+ exposure; runs Bilibili/Weibo/Red/Douyin plus overseas X (@summerxu490729), reaching global & domestic audiences.'},{n:'05',name:'AI Creative',d:'Leveraging AI across script, editing, grading and visuals to bring ideas to market faster and sharper.'},{n:'06',name:'Multicultural',d:'Fluent across Chinese, Japanese, Thai & UK cultures; deep in Thai fandoms and global Gen-Z audiences. Fluent English.'}]};
+    const PJ={zh:[{n:'01',cat:'catPersonal',name:'个人账号矩阵',type:'phones',links:[{label:'B站',icon:'B',color:'#fb7299',cn:'哔哩哔哩',href:'https://space.bilibili.com/25897119',video:'images/social/bilibili.mp4'},{label:'小红书',icon:'书',color:'#ff2442',cn:'小红书',href:'https://xhslink.cn/o/3Dbxb5fQph7',video:'images/social/xhs.mp4'},{label:'抖音',icon:'抖',color:'#161823',cn:'抖音',href:'https://v.douyin.com/-KWVa6WelIA/',video:'images/social/douyin.mp4'}]},{n:'02',cat:'catClient',name:'《眼睛很忙》眼科MV',type:'page',plat:'WeChat',accent:'#07c160',live:'https://weixin.qq.com/sph/AyDMCaxthU',video:'images/landing/videos/eyes-mv.mp4',desc:'人民日报官方转载 · 眼科主题推广MV'},{n:'03',cat:'catClient',name:'《视觉魔法师》眼科MV',type:'page',plat:'Weibo',accent:'#f5a623',live:'https://weibo.com/2803301701/4777407503143862',video:'images/landing/videos/vision-mv.mp4',desc:'省级三甲医院官方 · 眼科专题MV'},{n:'04',cat:'catFan',name:'不被定义的风 · 生贺',type:'page',plat:'Edit',accent:'#8b5cf6',video:'images/landing/videos/wind-edit.mp4',desc:'生贺剪辑——用光影为一帧帧陪伴致敬，剪出一首属于TA的「不被定义的风」。'},{n:'05',cat:'catAct',name:'钢铁侠 · 孤勇者',type:'page',plat:'Edit',accent:'#e04a3a',video:'images/landing/videos/guoyongzhe.mp4',desc:'影视人物向剪辑，以《孤勇者》写钢铁侠的热血与孤独。'},{n:'06',cat:'catDrama',name:'fiffy shades of neen · 剧情二创',type:'page',plat:'Edit',accent:'#1f9be0',video:'images/landing/videos/neen-edit.mp4',desc:'剧情二创，用新的叙事与光影重讲一段故事。'},{n:'07',cat:'catStage',name:'舞台剪辑 · Stage',type:'page',plat:'Edit',accent:'#7c5cff',video:'images/landing/videos/stage-edit.mp4',desc:'现场舞台高光时刻的节奏剪辑，燃点与情绪拉满。'},{n:'08',cat:'catEvent',name:'26运动会 · Event',type:'page',plat:'Edit',accent:'#0aa3a3',video:'images/landing/videos/sports-edit.mp4',desc:'活动记录向——把26运动会的热血瞬间与精彩剪影收录成片。'},{n:'09',cat:'catFounder',name:'峨眉山四源堂康养',type:'page',plat:'WeChat',accent:'#07c160',live:'https://weixin.qq.com/sph/ARMfez4ACi',video:'images/landing/videos/siyuantang.mp4',desc:'峨眉山四源堂康养中心 · 从0到1筹建与全链路运营'}],
+      en:[{n:'01',cat:'catPersonal',name:'Personal Account Matrix',type:'phones',links:[{label:'Bilibili',icon:'B',color:'#fb7299',cn:'Bilibili',href:'https://space.bilibili.com/25897119',video:'images/social/bilibili.mp4'},{label:'Red',icon:'书',color:'#ff2442',cn:'RED',href:'https://xhslink.cn/o/3Dbxb5fQph7',video:'images/social/xhs.mp4'},{label:'Douyin',icon:'抖',color:'#161823',cn:'Douyin',href:'https://v.douyin.com/-KWVa6WelIA/',video:'images/social/douyin.mp4'}]},{n:'02',cat:'catClient',name:'Eyes Are Busy · Eye-Care MV',type:'page',plat:'WeChat',accent:'#07c160',live:'https://weixin.qq.com/sph/AyDMCaxthU',video:'images/landing/videos/eyes-mv.mp4',desc:'Reposted by People\u2019s Daily · eye-care promo MV'},{n:'03',cat:'catClient',name:'Visual Magician · Eye-Care MV',type:'page',plat:'Weibo',accent:'#f5a623',live:'https://weibo.com/2803301701/4777407503143862',video:'images/landing/videos/vision-mv.mp4',desc:'Official MV for a provincial AAA hospital'},{n:'04',cat:'catFan',name:'Wind Undefined · Birthday Edit',type:'page',plat:'Edit',accent:'#8b5cf6',video:'images/landing/videos/wind-edit.mp4',desc:'A birthday fan edit honoring every frame of companionship — a tribute to a spirit not defined by the wind.'},{n:'05',cat:'catAct',name:'Iron Man · Lone Warrior',type:'page',plat:'Edit',accent:'#e04a3a',video:'images/landing/videos/guoyongzhe.mp4',desc:'Character edit set to Lone Warrior, telling the fire and loneliness of Tony Stark.'},{n:'06',cat:'catDrama',name:'fifty shades of neen · Story Remix',type:'page',plat:'Edit',accent:'#1f9be0',video:'images/landing/videos/neen-edit.mp4',desc:'A story remix re-telling a tale with new narrative and light.'},{n:'07',cat:'catStage',name:'Stage Edit',type:'page',plat:'Edit',accent:'#7c5cff',video:'images/landing/videos/stage-edit.mp4',desc:'Rhythm edit of on-stage highlights — energy and emotion dialed up.'},{n:'08',cat:'catEvent',name:'26 Sports Event Record',type:'page',plat:'Edit',accent:'#0aa3a3',video:'images/landing/videos/sports-edit.mp4',desc:'An event-record edit capturing the fiery moments and highlights of the sports meet.'},{n:'09',cat:'catFounder',name:'Emei Siyuantang Wellness',type:'page',plat:'WeChat',accent:'#07c160',live:'https://weixin.qq.com/sph/ARMfez4ACi',video:'images/landing/videos/siyuantang.mp4',desc:'Built from 0 to 1 and operated end-to-end' }]};
+    let services = SV[lang], projects = PJ[lang];
+    // ---- data ----
+    const photos = [ "images/landing/mq1.jpg","images/landing/mq2.jpg","images/landing/mq3.jpg","images/landing/mq4.jpg","images/landing/mq5.jpg","images/landing/mq6.jpg","images/landing/mq7.jpg","images/landing/mq8.jpg" ];
+
+    // ---- marquee ----
+    function tile(src){ return '<img loading="lazy" src="'+src+'" style="width:420px;height:270px;object-fit:cover" class="flex-none rounded-2xl">'; }
+    const r1 = document.querySelector('.row1'), r2 = document.querySelector('.row2');
+    const half = Math.ceil(photos.length/2);
+    const rowA = photos, rowB = photos.slice().reverse();
+    const a3 = [...rowA, ...rowA, ...rowA], b3 = [...rowB, ...rowB, ...rowB];
+    r1.innerHTML = a3.map(tile).join(''); r2.innerHTML = b3.map(tile).join('');
+    const wA = r1.scrollWidth/3, wB = r2.scrollWidth/3;
+
+    // ---- fade in ----
+    // ---- animated text ----
+    let spans = [];
+    function buildAbout(){ const p = document.getElementById('anim'); const phrase = T('aboutText'); p.textContent=''; spans.length=0; for (const ch of phrase){ const b=document.createElement('span'); b.className='ch'; b.textContent=(ch===' '?'\u00A0':ch); b.style.display='inline-block'; p.appendChild(b); spans.push(b); } }
+    const stats=[ {v:'133.8w',k:'statB'},{v:'469.3w',k:'statW'},{v:'388.5w',k:'statD'},{v:'1000w+',k:'statT'} ];
+    function statsHTML(){ return '<div class="mt-14 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">'+stats.map(s=>'<div class="border border-[#D7E2EA]/20 rounded-2xl p-5"><div class="hero-heading font-black text-3xl md:text-4xl">'+s.v+'</div><div class="text-[#D7E2EA]/60 uppercase tracking-wide text-sm mt-1">'+T(s.k)+'</div></div>').join('')+'</div>'; }
+    function renderServices(){ let svcHTML=''; services.forEach((s,i)=>{ svcHTML += '<div class="svc-item fade flex items-start gap-6 md:gap-10 py-8 sm:py-10 md:py-12 border-b border-[#0C0C0C]/15" style="transition-delay:'+(i*0.1)+'s"><div class="font-black flex-none" style="font-size:clamp(3rem,10vw,140px);color:#0C0C0C">'+s.n+'</div><div class="flex-1"><div class="font-medium uppercase" style="font-size:clamp(1rem,2.2vw,2.1rem)">'+s.name+'</div><div class="font-light leading-relaxed max-w-2xl opacity-60 mt-2" style="font-size:clamp(.85rem,1.6vw,1.25rem)">'+s.d+'</div></div></div>'; }); svcHTML += '<div class="fc fade" style="transition-delay:.5s">'+statsHTML()+'</div>'; document.getElementById('svc').innerHTML = svcHTML; }
+    const stack = document.getElementById('stack');
+    let cards = [];
+        function phoneCard(a){ var body = a.video ? '<video src="'+a.video+'" autoplay muted loop playsinline preload="auto" style="position:absolute;left:0;right:0;top:38px;bottom:0;width:100%;height:calc(100% - 38px);object-fit:cover"></video>' : '<div class="absolute inset-0 grid place-items-center text-white" style="background:'+a.color+'"><div class="text-center"><div class="text-3xl font-black">'+a.icon+'</div><div class="text-xs mt-1 uppercase tracking-widest">'+a.cn+'</div></div></div>'; var badge = a.extra ? '<span class="ml-auto text-[10px] px-1.5 py-0.5 rounded-full bg-[#ffb020] text-black font-bold">'+a.extra+'</span>' : '<span class="ml-auto text-[10px] text-white/60">@Summer Xu</span>'; return '<a href="'+a.href+'" target="_blank" rel="noopener" class="block text-center" style="--c:'+a.color+'"><div class="relative mx-auto w-[200px] h-[420px] rounded-[28px] border-4 border-[#1c1c20] bg-black overflow-hidden"><div class="absolute left-1/2 top-[6px] -translate-x-1/2 w-16 h-3 rounded-b-[10px] bg-[#0a0a0d] z-10"></div><div class="relative z-[2] flex items-center gap-2 px-3 py-1.5 bg-black/40 backdrop-blur border-b border-white/10"><span class="w-5 h-5 rounded-md grid place-items-center text-white text-[11px] font-bold" style="background:'+a.color+'">'+a.icon+'</span><span class="text-[12px] font-semibold text-white">'+a.cn+'</span>'+badge+'</div>'+body+'</div><div class="mt-2 text-[12px] text-[#D7E2EA]/80">'+a.cn+' · ↗</div></a>'; }
+        function projBody(p){
+      if(p.type==='phones') return '<div class="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-12 place-items-center py-2">'+p.links.map(phoneCard).join('')+'</div>';
+      if(p.type==='page'){
+        var ic = p.plat==='WeChat' ? 'V' : (p.plat==='Weibo' ? '博' : '剪');
+        var pt = p.plat==='WeChat' ? T('wxChannels') : (p.plat==='Weibo' ? T('weibo') : T('editTitle'));
+        var btn = (p.live && p.live!=='#') ? '<a href="'+p.live+'" target="_blank" rel="noopener" class="inline-block ghost-btn rounded-full px-6 py-2 text-sm uppercase tracking-widest">'+T('openPlatform')+'</a>' : '';
+        return '<div class="grid md:grid-cols-2 gap-4 md:gap-6 items-center"><div class="flex flex-col justify-center gap-3">'
+          + '<div class="flex items-center gap-3"><span class="w-9 h-9 rounded-xl grid place-items-center text-white font-black text-base" style="background:'+p.accent+'">'+ic+'</span>'
+          + '<div><div class="text-sm font-semibold uppercase tracking-wide">'+pt+'</div><div class="text-[#D7E2EA]/55 text-xs">'+T('official')+'</div></div></div>'
+          + '<div class="text-[#D7E2EA]/70 text-xs md:text-sm">'+p.desc+'</div>'+btn+'</div>'
+          + '<div class="flex items-center justify-center"><video src="'+p.video+'" controls playsinline loop preload="metadata" class="w-full max-w-[540px] rounded-2xl border border-white/10" style="max-height:62vh;object-fit:contain;background:#000"></video></div></div>';
+      }
+      return '<div class="mt-6 grid grid-cols-5 gap-3"><div class="col-span-2 flex flex-col gap-3"><img class="w-full object-cover rounded-[40px]" style="height:clamp(130px,16vw,230px)" src="'+p.img[0]+'"><img class="w-full object-cover rounded-[40px]" style="height:clamp(160px,22vw,340px)" src="'+p.img[1]+'"></div><div class="col-span-3"><img class="w-full h-full object-cover rounded-[40px]" src="'+p.img[2]+'"></div></div>';
+    }
+    function renderProjects(){ let pH=''; projects.forEach((p,i)=>{ const t = 1 - (projects.length-1-i)*0.03; const topRight = (p.type==='phones') ? '<span class="uppercase tracking-widest text-[#D7E2EA]/50 text-xs">'+T('tapPhone')+'</span>' : (p.live&&p.live!=='#'?'<a href="'+p.live+'" target="_blank" rel="noopener" class="ghost-btn rounded-full px-8 py-3 text-sm uppercase tracking-widest">'+T('live')+'</a>':''); pH += '<div class="proj-card sticky top-16 md:top-24 mx-auto" style="--ts:'+t+'"><div class="rounded-[40px] sm:rounded-[50px] md:rounded-[60px] border-2 border-[#D7E2EA] bg-[#0C0C0C] p-4 sm:p-5 md:p-6 flex flex-col justify-center" style="height:min(70vh,660px);overflow:hidden"><div class="flex items-center justify-between flex-wrap gap-4"><div class="font-black" style="font-size:clamp(2rem,6vw,84px)">'+p.n+'</div><div class="flex items-center gap-4 flex-wrap"><span class="uppercase tracking-widest text-[#D7E2EA]/70 text-sm">'+T(p.cat)+'</span><span class="uppercase font-medium text-lg md:text-2xl">'+p.name+'</span>'+topRight+'</div></div><div class="mt-4 w-full flex justify-center">'+projBody(p)+'</div></div></div>'; }); stack.innerHTML = pH; cards = [...document.querySelectorAll('.proj-card')]; }
+    buildAbout(); renderServices(); renderProjects();
+
+    // ---- fade in (observe all, incl. injected sections) ----
+    const io = new IntersectionObserver((es)=>{ es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }); }, { rootMargin:"50px", amount:0 });
+    document.querySelectorAll('.fade').forEach((el,ix)=>{ if(!el.style.transitionDelay) el.style.transitionDelay = (ix%4)*0.06+'s'; });
+    document.querySelectorAll('.fade').forEach(el=>io.observe(el));
+
+    // ---- magnetic ----
+    document.querySelectorAll('.magnet').forEach(el=>{
+      el.addEventListener('mousemove', e=>{ const r=el.getBoundingClientRect(); const dx=(e.clientX-(r.left+r.width/2))/3; const dy=(e.clientY-(r.top+r.height/2))/3; el.style.transition='transform .3s ease-out'; el.style.transform='translate3d('+dx+'px,'+dy+'px,0)'; });
+      el.addEventListener('mouseleave', ()=>{ el.style.transition='transform .6s ease-in-out'; el.style.transform='translate3d(0,0,0)'; });
+    });
+
+    // ---- scroll loop ----
+    const animSec = document.getElementById('about');
+    function onScroll(){
+      // marquee
+      const mq = document.getElementById('marquee'); const mr = mq.getBoundingClientRect();
+      const off = (window.scrollY - (mq.offsetTop - window.innerHeight)) * 0.3;
+      let x1 = ((-200 + off) % wA + wA) % wA; let x2 = ((-200 + off) % wB + wB) % wB;
+      r1.style.transform = 'translateX(' + x1 + 'px)';
+      r2.style.transform = 'translateX(' + (-x2) + 'px)';
+      // animated text
+      const r = animSec.getBoundingClientRect(); const prog = Math.min(1, Math.max(0, (window.innerHeight - r.top) / (r.height)));
+      spans.forEach((sp,i)=>{ const pos = i/spans.length; const w = 0.25; const o = Math.min(1, Math.max(0, (prog - pos) / w)); sp.style.opacity = (0.2 + 0.8*o).toFixed(3); });
+      cards.forEach((c,i)=>{ const ts = parseFloat(c.style.getPropertyValue('--ts')) || 1; let sc = 1; if (i < cards.length-1) { const ct = c.getBoundingClientRect().top; const nt = cards[i+1].getBoundingClientRect().top; const p = Math.min(1, Math.max(0, (window.innerHeight - nt) / (window.innerHeight - ct + 1))); sc = 1 - p*(1-ts); } c.style.transform = 'scale(' + sc.toFixed(4) + ')'; });
+    }
+    window.addEventListener('scroll', onScroll, { passive:true });
+    window.addEventListener('resize', ()=>{ onScroll(); });
+    function applyStatic(){ document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = T(el.getAttribute('data-i18n')); }); }
+    function setLang(l){ lang=l; services=SV[l]; projects=PJ[l]; applyStatic(); buildAbout(); renderServices(); renderProjects(); document.querySelectorAll('.fade').forEach(el=>el.classList.add('in')); onScroll(); }
+    applyStatic();
+    document.getElementById('LangBtn').addEventListener('click', ()=>{ setLang(lang==='zh'?'en':'zh'); });
+    onScroll();
+    function startGlobe(){ if (window.Globe && document.getElementById('globeCanvas')) { try { window.Globe.init(document.getElementById('globeCanvas')); } catch(e){} } }
+    startGlobe(); window.addEventListener('load', startGlobe);
+    var hc=document.getElementById('heroContact'); if(hc){ hc.addEventListener('click', function(e){ e.preventDefault(); if(window.parent && window.parent!==window){ try{ window.parent.postMessage({type:'nav', hash:'#/photography'}, '*'); }catch(x){} } else { location.hash='#/photography'; } }); }
+  </script>
+</body>
+</html>

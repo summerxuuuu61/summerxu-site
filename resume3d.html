@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Summer Xu · 3D 简历</title>
+  <style>
+    :root {
+      --bg: #0e0b09;
+      --bg-soft: #181310;
+      --ink: #f3ede2;
+      --ink-soft: #b5a890;
+      --ink-dim: #6f6557;
+      --line: #2b241d;
+      --accent: #e0b26b;
+      --accent-2: #c98a4b;
+      --serif: Georgia, "Songti SC", "STSong", "Noto Serif SC", serif;
+      --sans: "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", -apple-system, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body, html { height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    ::selection { background: var(--accent); color: #1a1305; }
+
+    /* ---------- 3D 画布 ---------- */
+    #scene {
+      position: fixed; inset: 0; z-index: 0;
+      pointer-events: none;
+    }
+    #scene canvas { display: block; }
+
+    /* ---------- 加载页 ---------- */
+    #loader {
+      position: fixed; inset: 0; z-index: 9999;
+      display: grid; place-items: center;
+      background: var(--bg);
+      transition: opacity .8s ease, visibility .8s ease;
+    }
+    #loader.is-done { opacity: 0; visibility: hidden; }
+    .loader__inner { text-align: center; }
+    .loader__ring {
+      width: 48px; height: 48px; margin: 0 auto 18px;
+      border: 1px solid var(--line); border-top-color: var(--accent);
+      border-radius: 50%; animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader__t { font-family: var(--serif); letter-spacing: .4em; font-size: 14px; color: var(--ink-soft); }
+
+    /* ---------- 导航 ---------- */
+    header.site {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 40;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px clamp(20px, 5vw, 64px);
+      border-bottom: 1px solid transparent;
+      transition: border-color .4s ease, background .4s ease, backdrop-filter .4s ease;
+    }
+    header.site.is-scrolled {
+      background: rgba(14, 11, 9, .72);
+      border-color: var(--line);
+      backdrop-filter: blur(12px);
+    }
+    .brand { display: grid; gap: 1px; line-height: 1.2; }
+    .brand__en { font-family: var(--serif); font-size: 20px; letter-spacing: .06em; }
+    .brand__zh { font-size: 11px; letter-spacing: .34em; color: var(--ink-soft); }
+    nav.links { display: flex; gap: 26px; align-items: center; }
+    nav.links a {
+      font-size: 13px; letter-spacing: .06em; color: var(--ink-soft);
+      text-decoration: none; position: relative; padding: 4px 0;
+      transition: color .25s ease;
+    }
+    nav.links a::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 1px;
+      background: var(--ink); transform: scaleX(0); transform-origin: left;
+      transition: transform .3s ease;
+    }
+    nav.links a:hover, nav.links a.is-active { color: var(--ink); }
+    nav.links a:hover::after, nav.links a.is-active::after { transform: scaleX(1); }
+    @media (max-width: 640px) { nav.links a { font-size: 12px; } nav.links a:nth-child(4) { display: none; } }
+
+    /* ---------- 滚动正文覆盖层 ---------- */
+    .overlay { position: relative; z-index: 10; }
+    section { max-width: 1080px; margin: 0 auto; padding: clamp(70px, 12vh, 130px) clamp(22px, 6vw, 60px); }
+    .eyebrow {
+      font-size: 12px; letter-spacing: .34em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 18px;
+    }
+    .sec-title {
+      font-family: var(--serif); font-size: clamp(34px, 5vw, 60px);
+      font-weight: 400; line-height: 1.08; letter-spacing: .01em;
+    }
+    .sec-lead { margin-top: 22px; max-width: 620px; color: var(--ink-soft); font-size: 16px; }
+    .fade { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; }
+    .fade.on { opacity: 1; transform: none; }
+
+    /* ---------- 首页 Hero ---------- */
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+      padding-top: 110px; padding-bottom: 60px;
+    }
+    .hero .kicker {
+      font-size: 12px; letter-spacing: .4em; text-transform: uppercase;
+      color: var(--ink-soft); margin-bottom: 22px;
+    }
+    .hero h1 {
+      font-family: var(--serif); font-weight: 400;
+      font-size: clamp(46px, 9vw, 110px); line-height: 1.02; letter-spacing: -.01em;
+    }
+    .hero h1 .accent { color: var(--accent); font-style: italic; }
+    .hero .role { margin-top: 26px; font-size: clamp(16px, 2vw, 20px); color: var(--ink-soft); letter-spacing: .06em; }
+    .hero .stats { margin-top: 42px; display: flex; gap: clamp(28px, 5vw, 60px); flex-wrap: wrap; }
+    .stat b { display: block; font-family: var(--serif); font-size: clamp(26px, 3.4vw, 40px); color: var(--accent); font-weight: 400; }
+    .stat span { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-dim); }
+    .hero .hint { margin-top: 60px; display: flex; align-items: center; gap: 12px; color: var(--ink-soft); font-size: 13px; letter-spacing: .12em; }
+    .hint .line { width: 42px; height: 1px; background: var(--accent); }
+
+    /* ---------- 经历时间线 ---------- */
+    .timeline { margin-top: 46px; border-left: 1px solid var(--line); padding-left: clamp(20px, 4vw, 42px); }
+    .tl-item { position: relative; padding-bottom: 42px; }
+    .tl-item::before {
+      content: ""; position: absolute; left: calc(-1 * clamp(20px, 4vw, 42px) - 6px); top: 5px;
+      width: 11px; height: 11px; border-radius: 50%; background: var(--accent);
+      box-shadow: 0 0 0 5px rgba(224, 178, 107, .14);
+    }
+    .tl-item__meta { font-size: 12px; letter-spacing: .18em; color: var(--accent-2); text-transform: uppercase; }
+    .tl-item__role { font-family: var(--serif); font-size: 24px; margin: 8px 0 6px; }
+    .tl-item__org { font-size: 13px; letter-spacing: .1em; color: var(--ink-soft); margin-bottom: 10px; }
+    .tl-item__p { color: var(--ink-soft); font-size: 15px; max-width: 560px; }
+
+    /* ---------- 技能 ---------- */
+    .skills { margin-top: 40px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    @media (max-width: 640px) { .skills { grid-template-columns: 1fr; } }
+    .skill {
+      border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px;
+      background: rgba(30, 24, 18, .4); display: flex; align-items: center; gap: 16px;
+      transition: border-color .3s ease, transform .3s ease, background .3s ease, box-shadow .3s ease;
+    }
+    .skill:hover {
+      border-color: var(--accent); background: rgba(38, 30, 22, .6);
+      box-shadow: 0 10px 32px rgba(0,0,0,.4); transform: translateY(-2px);
+    }
+    .skill__no { font-family: var(--serif); font-size: 22px; color: var(--accent); width: 34px; flex: none; }
+    .skill__name { font-size: 17px; font-weight: 600; }
+    .skill__tag { font-size: 12px; color: var(--ink-dim); letter-spacing: .06em; margin-top: 2px; }
+
+    /* ---------- 项目 ---------- */
+    .cards { margin-top: 44px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    @media (max-width: 720px) { .cards { grid-template-columns: 1fr; } }
+    .card {
+      position: relative; border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
+      background: linear-gradient(160deg, rgba(38, 30, 22, .55), rgba(20, 16, 12, .5));
+      transition: transform .35s ease, border-color .35s ease, box-shadow .35s ease;
+      display: block; color: inherit; text-decoration: none;
+    }
+    .card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 20px 46px rgba(0,0,0,.5); }
+    .card__pad { padding: 26px 26px 22px; }
+    .card__no { font-size: 12px; letter-spacing: .2em; color: var(--accent); }
+    .card__title { font-family: var(--serif); font-size: 26px; margin: 12px 0 10px; }
+    .card__p { color: var(--ink-soft); font-size: 14px; }
+    .card__tags { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .card__tags span { font-size: 11px; letter-spacing: .1em; color: var(--ink-soft); border: 1px solid var(--line); padding: 4px 10px; border-radius: 999px; }
+
+    /* ---------- 联系 ---------- */
+    .contact { padding-bottom: 90px; }
+    .contact a.big {
+      display: inline-block; margin-top: 30px; font-family: var(--serif);
+      font-size: clamp(28px, 5vw, 52px); color: var(--ink); text-decoration: none;
+      border-bottom: 1px solid var(--accent); padding-bottom: 6px; transition: color .3s ease;
+    }
+    .contact a.big:hover { color: var(--accent); }
+    .foot-row { margin-top: 70px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; color: var(--ink-dim); font-size: 13px; letter-spacing: .1em; }
+    .socials { display: flex; gap: 20px; }
+    .socials a { color: var(--ink-soft); text-decoration: none; font-size: 13px; letter-spacing: .1em; transition: color .25s; }
+    .socials a:hover { color: var(--accent); }
+
+    /* ---------- 3D 球上的提示标签 ---------- */
+    .node-tip {
+      position: fixed; z-index: 30; pointer-events: none;
+      transform: translate(-50%, 0); padding: 6px 12px; border-radius: 999px;
+      background: rgba(14, 11, 9, .85); border: 1px solid var(--line);
+      color: var(--ink); font-size: 12px; letter-spacing: .12em; white-space: nowrap;
+      opacity: 0; transition: opacity .2s ease; box-shadow: 0 8px 24px rgba(0,0,0,.4);
+    }
+    .node-tip.is-on { opacity: 1; }
+
+    /* ---------- 自定义光标 ---------- */
+    .cursor {
+      position: fixed; z-index: 9998; pointer-events: none; left: 0; top: 0;
+      transform: translate(-50%, -50%);
+    }
+    .cursor__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+    .cursor__ring {
+      width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(224,178,107,.6);
+      position: absolute; left: 0; top: 0; transform: translate(-50%,-50%);
+      transition: width .25s ease, height .25s ease, border-color .25s ease, opacity .25s ease;
+    }
+    .cursor.is-hover .cursor__ring { width: 54px; height: 54px; border-color: var(--accent); }
+    .cursor.is-hover .cursor__dot { background: #fff; }
+    @media (pointer: coarse) { .cursor { display: none; } }
+
+    /* ---------- 侧边秒点 ---------- */
+    .rail { position: fixed; right: clamp(16px, 3vw, 36px); top: 50%; transform: translateY(-50%); z-index: 20; display: grid; gap: 14px; }
+    .rail a { width: 10px; height: 10px; border-radius: 50%; border: 1px solid var(--ink-dim); position: relative; transition: border-color .3s, transform .3s; }
+    .rail a.is-active { border-color: var(--accent); transform: scale(1.35); }
+    .rail a:hover::after {
+      content: attr(data-t); position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+      font-size: 11px; letter-spacing: .12em; color: var(--ink-soft); white-space: nowrap;
+    }
+    @media (max-width: 720px) { .rail { display: none; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <!-- 加载页 -->
+  <div id="loader"><div class="loader__inner"><div class="loader__ring"></div><div class="loader__t">LOADING</div></div></div>
+
+  <!-- 3D 场景容器 -->
+  <div id="scene"></div>
+
+  <!-- 导航 -->
+  <header class="site" id="siteHead">
+    <a class="brand" href="#hero">
+      <span class="brand__en">Summer Xu</span>
+      <span class="brand__zh">徐琦然 · 3D 简历</span>
+    </a>
+    <nav class="links" aria-label="版块">
+      <a href="#about">关于</a>
+      <a href="#experience">经历</a>
+      <a href="#skills">技能</a>
+      <a href="#projects">项目</a>
+      <a href="#contact">联系</a>
+    </nav>
+  </header>
+
+  <!-- 侧边秒点 -->
+  <div class="rail" id="rail"></div>
+
+  <!-- 正文覆盖层 -->
+  <main class="overlay">
+    <section class="hero" id="hero" data-sec="hero">
+      <div class="kicker fade">可交互 · 3D · 个人简历</div>
+      <h1 class="fade">你好，我是 <span class="accent">Summer</span>。</h1>
+      <p class="role fade">纪实摄影师 · 视频剪辑师 · 用影像记录世界</p>
+      <div class="stats fade">
+        <div class="stat"><b>12</b><span>个国家</span></div>
+        <div class="stat"><b>40+</b><span>个地标</span></div>
+        <div class="stat"><b>2000+</b><span>张影像</span></div>
+      </div>
+      <div class="hint fade"><span class="line"></span>往下滑动，让镜头带你飞过我的履历</div>
+    </section>
+
+    <section id="about" data-sec="about">
+      <div class="eyebrow fade">01 / About</div>
+      <h2 class="sec-title fade">关于我</h2>
+      <p class="sec-lead fade">
+        一名纪实摄影师与视频创作者。相信影像是一种语言：把路上的见闻、陌生人的故事、那些转瞬即逝的光，整理成可以回望的档案。
+        我喜欢用镜头在真实里寻找结构，也喜欢用剪辑把碎片缝合成叙事。
+      </p>
+      <div class="skills" style="margin-top:44px">
+        <div class="skill fade"><span class="skill__no">✎</span><div><div class="skill__name">影像叙事</div><div class="skill__tag">纪实 · 报道 · 人像</div></div></div>
+        <div class="skill fade"><span class="skill__no">◉</span><div><div class="skill__name">摄影创作</div><div class="skill__tag">城市 · 风光 · 人文</div></div></div>
+      </div>
+    </section>
+
+    <section id="experience" data-sec="experience">
+      <div class="eyebrow fade">02 / Experience</div>
+      <h2 class="sec-title fade">经历</h2>
+      <div class="timeline">
+        <div class="tl-item fade">
+          <div class="tl-item__meta">2023 — 至今</div>
+          <div class="tl-item__role">独立摄影师 / 视频创作者</div>
+          <div class="tl-item__org">个人项目 · 长期</div>
+          <div class="tl-item__p">持续拍摄并整理城市与旅行影像档案，剪辑系列视频作品，在多个平台发布。</div>
+        </div>
+        <div class="tl-item fade">
+          <div class="tl-item__meta">2021 — 2023</div>
+          <div class="tl-item__role">视频剪辑 / 后期</div>
+          <div class="tl-item__org">内容制作 · 项目合作</div>
+          <div class="tl-item__p">负责剧情混剪、节奏剪辑与调色，打磨影像的叙事与视听节奏。</div>
+        </div>
+        <div class="tl-item fade">
+          <div class="tl-item__meta">2019 — 2021</div>
+          <div class="tl-item__role">摄影学习与实践</div>
+          <div class="tl-item__org">纪实 / 新闻方向</div>
+          <div class="tl-item__p">系统学习纪实与新闻摄影，持续靠近真实，也靠近人物。</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="skills" data-sec="skills">
+      <div class="eyebrow fade">03 / Skills</div>
+      <h2 class="sec-title fade">技能</h2>
+      <p class="sec-lead fade">下方这些光球也悬浮在 3D 场景里，可以点击其中任意一颗，让镜头飞过去。</p>
+      <div class="skills">
+        <div class="skill fade"><span class="skill__no">01</span><div><div class="skill__name">摄影构图</div><div class="skill__tag">光影 · 构图 · 色彩</div></div></div>
+        <div class="skill fade"><span class="skill__no">02</span><div><div class="skill__name">Premiere 剪辑</div><div class="skill__tag">节奏 · 剪辑</div></div></div>
+        <div class="skill fade"><span class="skill__no">03</span><div><div class="skill__name">色彩调色</div><div class="skill__tag">DaVinci · 电影感</div></div></div>
+        <div class="skill fade"><span class="skill__no">04</span><div><div class="skill__name">影像叙事</div><div class="skill__tag">脚本 · 结构 · 情绪</div></div></div>
+        <div class="skill fade"><span class="skill__no">05</span><div><div class="skill__name">网页与 3D 交互</div><div class="skill__tag">Three.js · HTML · CSS</div></div></div>
+        <div class="skill fade"><span class="skill__no">06</span><div><div class="skill__name">项目统筹</div><div class="skill__tag">执行 · 协作 · 交付</div></div></div>
+      </div>
+    </section>
+
+    <section id="projects" data-sec="projects">
+      <div class="eyebrow fade">04 / Projects</div>
+      <h2 class="sec-title fade">代表项目</h2>
+      <div class="cards">
+        <a class="card fade" href="#contact">
+          <div class="card__pad">
+            <div class="card__no">P · 01</div>
+            <div class="card__title">摄影作品集</div>
+            <div class="card__p">跨国纪实与旅行影像档案，按国家与地区整理成可浏览画廊。</div>
+            <div class="card__tags"><span>纪实</span><span>城市</span><span>人像</span></div>
+          </div>
+        </a>
+        <a class="card fade" href="#contact">
+          <div class="card__pad">
+            <div class="card__no">P · 02</div>
+            <div class="card__title">视频混剪</div>
+            <div class="card__p">系列剧情混剪，以节奏与色彩营造情绪，单条播放可圈可点。</div>
+            <div class="card__tags"><span>Premiere</span><span>调色</span><span>叙事</span></div>
+          </div>
+        </a>
+        <a class="card fade" href="#contact">
+          <div class="card__pad">
+            <div class="card__no">P · 03</div>
+            <div class="card__title">3D 交互简历</div>
+            <div class="card__p">你正在看的这个页面——用 Three.js 手搓的沉浸式简历体验。</div>
+            <div class="card__tags"><span>Three.js</span><span>交互</span><span>创意</span></div>
+          </div>
+        </a>
+        <a class="card fade" href="#contact">
+          <div class="card__pad">
+            <div class="card__no">P · 04</div>
+            <div class="card__title">个人网站系统</div>
+            <div class="card__p">可持续更新的作品站：数据驱动 + 本地管理 + 多地区视觉风格。</div>
+            <div class="card__tags"><span>HTML</span><span>JS</span><span>系统</span></div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="contact" id="contact" data-sec="contact">
+      <div class="eyebrow fade">05 / Contact</div>
+      <h2 class="sec-title fade">保持联系</h2>
+      <p class="sec-lead fade">欢迎约拍、合作，或者只是想聊聊影像。下面这颗光球，点击即可飞达。</p>
+      <a class="big fade" href="mailto:hello@example.com">hello@example.com</a>
+      <div class="foot-row">
+        <div class="socials">
+          <a href="#">Instagram</a>
+          <a href="#">小红书</a>
+          <a href="#">Bilibili</a>
+          <a href="#">抖音</a>
+        </div>
+        <div>© <span id="year"></span> Summer Xu · 徐琦然</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 3D 光球悬停标签 -->
+  <div class="node-tip" id="nodeTip"></div>
+
+  <!-- 自定义光标 -->
+  <div class="cursor" id="cursor"><div class="cursor__ring"></div><div class="cursor__dot"></div></div>
+
+  <script src="js/three.min.js"></script>
+  <script>
+  (function () {
+    "use strict";
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    var SECTION_ORDER = ["about", "experience", "skills", "projects", "contact"];
+    var COLORS = { accent: 0xe0b26b, soft: 0x8a7c63, cream: 0xf3ede2, bg: 0x0e0b09 };
+
+    // ---------- 场景 ----------
+    var container = document.getElementById("scene");
+    var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement);
+
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.1, 300);
+    var CAM_R = 11, CAM_H = 1.2;
+    camera.position.set(CAM_R * Math.cos(0), CAM_H, CAM_R * Math.sin(0));
+    camera.lookAt(0, 0, 0);
+
+    scene.fog = new THREE.FogExp2(COLORS.bg, 0.018);
+
+    // 灯光
+    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+    var keyLight = new THREE.PointLight(0xe0b26b, 1.4, 60);
+    keyLight.position.set(6, 6, 8);
+    scene.add(keyLight);
+    var rim = new THREE.PointLight(0x6a86c9, 0.8, 50);
+    rim.position.set(-8, -4, -6);
+    scene.add(rim);
+
+    // 星星
+    function makeStars(n, r0, r1, color, size) {
+      var arr = [];
+      for (var i = 0; i < n; i++) {
+        var p = Math.acos(2 * Math.random() - 1);
+        var t = Math.random() * Math.PI * 2;
+        var r = r0 + Math.random() * (r1 - r0);
+        arr.push(r * Math.sin(p) * Math.cos(t), r * Math.cos(p), r * Math.sin(p) * Math.sin(t));
+      }
+      var g = new THREE.BufferGeometry();
+      g.setAttribute("position", new THREE.Float32BufferAttribute(arr, 3));
+      var m = new THREE.PointsMaterial({ color: color, size: size, sizeAttenuation: true, transparent: true, opacity: 0.8 });
+      return new THREE.Points(g, m);
+    }
+    var stars = makeStars(1100, 20, 60, 0xb8a98c, 0.14);
+    scene.add(stars);
+    var dust = makeStars(500, 8, 22, 0xe0b26b, 0.07);
+    scene.add(dust);
+
+    // ---------- 中央核心（对应 Hero） ----------
+    var core = new THREE.Mesh(
+      new THREE.IcosahedronGeometry(1.2, 2),
+      new THREE.MeshStandardMaterial({ color: COLORS.accent, roughness: 0.25, metalness: 0.35, emissive: 0x3a2410, emissiveIntensity: 0.8 })
+    );
+    scene.add(core);
+    var coreWire = new THREE.Mesh(
+      new THREE.IcosahedronGeometry(1.65, 1),
+      new THREE.MeshBasicMaterial({ color: COLORS.accent, wireframe: true, transparent: true, opacity: 0.35 })
+    );
+    scene.add(coreWire);
+
+    // ---------- 版块光球（5 颗） ----------
+    var group = new THREE.Group();
+    scene.add(group);
+    var N = SECTION_ORDER.length;
+    var R = 6.4;
+    var nodes = [];
+    for (var i = 0; i < N; i++) {
+      var a = (i / N) * Math.PI * 2 - Math.PI / 2;
+      var x = R * Math.cos(a), z = R * Math.sin(a);
+      var y = (i % 2 === 0 ? 0.4 : -0.6);
+      var node = new THREE.Mesh(
+        new THREE.SphereGeometry(0.55, 32, 32),
+        new THREE.MeshStandardMaterial({ color: COLORS.cream, roughness: 0.2, metalness: 0.6, emissive: 0x241a10, emissiveIntensity: 0.5 })
+      );
+      node.position.set(x, y, z);
+      node.userData = { idx: i, sec: SECTION_ORDER[i], baseY: y };
+      group.add(node);
+      nodes.push(node);
+
+      // 环
+      var ring = new THREE.Mesh(
+        new THREE.TorusGeometry(0.85, 0.02, 8, 48),
+        new THREE.MeshBasicMaterial({ color: COLORS.accent, transparent: true, opacity: 0.5 })
+      );
+      ring.rotation.x = Math.PI / 2;
+      node.add(ring);
+    }
+
+    // 连线（星座）
+    var linePts = [];
+    for (var k = 0; k < N; k++) {
+      var p1 = nodes[k].position;
+      var p2 = nodes[(k + 1) % N].position;
+      linePts.push(p1.clone(), p2.clone());
+    }
+    var lineGeo = new THREE.BufferGeometry().setFromPoints(linePts);
+    var lines = new THREE.LineSegments(lineGeo, new THREE.LineBasicMaterial({ color: COLORS.soft, transparent: true, opacity: 0.35 }));
+    group.add(lines);
+
+    // ---------- 交互状态 ----------
+    var activeIdx = -1;         // -1 = hero
+    var targetAngle = 0;
+    var curAngle = 0;
+    var targetDist = CAM_R, curDist = CAM_R;
+    var targetH = CAM_H, curH = CAM_H;
+    var hover = -1;
+    var raycaster = new THREE.Raycaster();
+    var mouse = new THREE.Vector2(0, 0);
+    var pmouse = new THREE.Vector2(0, 0);
+
+    // 角度基准：node i 的角度
+    function nodeAngle(i) { return (i / N) * Math.PI * 2 - Math.PI / 2; }
+
+    var sections = [];
+    SECTION_ORDER.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) sections.push({ id: id, el: el });
+    });
+
+    function setActive(id) {
+      var idx = SECTION_ORDER.indexOf(id);
+      activeIdx = idx;
+      if (idx >= 0) {
+        targetAngle = nodeAngle(idx);
+        targetDist = 8.6;
+        targetH = 0.6;
+      } else {
+        targetAngle = 0;
+        targetDist = CAM_R;
+        targetH = CAM_H;
+      }
+      // 导航 + 秒点状态
+      document.querySelectorAll("nav.links a, .rail a").forEach(function (a) {
+        var href = a.getAttribute("href");
+        a.classList.toggle("is-active", id === "hero" ? href === "#hero" : href === "#" + id);
+      });
+    }
+
+    // IntersectionObserver 检测当前版块
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) setActive(e.target.dataset.sec || e.target.id);
+      });
+    }, { rootMargin: "-45% 0px -45% 0px", threshold: 0 });
+    document.querySelectorAll("section[data-sec]").forEach(function (s) { io.observe(s); });
+
+    // ---------- 侧边秒点渲染 ----------
+    var rail = document.getElementById("rail");
+    var railMap = {};
+    SECTION_ORDER.forEach(function (id) {
+      var a = document.createElement("a");
+      a.setAttribute("href", "#" + id);
+      a.setAttribute("data-t", document.getElementById(id).querySelector(".sec-title") ? document.getElementById(id).querySelector(".sec-title").textContent : id);
+      a.addEventListener("click", function (ev) { ev.preventDefault(); document.getElementById(id).scrollIntoView({ behavior: "smooth" }); });
+      rail.appendChild(a);
+      railMap[id] = a;
+    });
+
+    // ---------- 鼠标 ----------
+    var cursor = document.getElementById("cursor");
+    var curX = innerWidth / 2, curY = innerHeight / 2;
+    document.addEventListener("pointermove", function (e) {
+      mouse.x = (e.clientX / innerWidth) * 2 - 1;
+      mouse.y = -(e.clientY / innerHeight) * 2 + 1;
+      pmouse.x = e.clientX / innerWidth - 0.5;
+      pmouse.y = e.clientY / innerHeight - 0.5;
+      curX = e.clientX; curY = e.clientY;
+    });
+
+    function toSection(id) {
+      document.getElementById(id).scrollIntoView({ behavior: "smooth" });
+    }
+
+    // 点击命中的光球 → 飞到对应版块
+    renderer.domElement.style.pointerEvents = "none";
+    // 让点击仍能命中 canvas；我们监听 window 的 pointerdown，命中光球时滚动到版块
+    document.addEventListener("pointerdown", function (e) {
+      var p = { x: (e.clientX / innerWidth) * 2 - 1, y: -(e.clientY / innerHeight) * 2 + 1 };
+      raycaster.setFromCamera(p, camera);
+      var hits = raycaster.intersectObjects(nodes, false);
+      if (hits.length) {
+        var idx = hits[0].object.userData.idx;
+        toSection(SECTION_ORDER[idx]);
+      }
+    });
+
+    // ---------- 动画循环 ----------
+    var tip = document.getElementById("nodeTip");
+    var clock = new THREE.Clock();
+    var time = 0;
+    function animate() {
+      requestAnimationFrame(animate);
+      var dt = clock.getDelta();
+      time += dt;
+
+      // 平滑相机
+      curAngle += (targetAngle - curAngle) * 0.06;
+      curDist += (targetDist - curDist) * 0.06;
+      curH += (targetH - curH) * 0.06;
+      // 鼠标视差
+      var px = pmouse.x * 1.3, py = pmouse.y * 0.8;
+      var cx = Math.cos(curAngle), sz = Math.sin(curAngle);
+      camera.position.set(curDist * cx + px, curH + py, curDist * sz);
+      camera.lookAt(px * 0.4, py * 0.4, 0);
+
+      // 星星缓慢旋转
+      stars.rotation.y += dt * 0.012;
+      dust.rotation.y -= dt * 0.02;
+
+      // 核心脉动
+      var s = 1 + Math.sin(time * 1.4) * 0.05;
+      core.scale.setScalar(s);
+      core.rotation.x += dt * 0.15; core.rotation.y += dt * 0.2;
+      coreWire.rotation.x -= dt * 0.12; coreWire.rotation.y -= dt * 0.16;
+
+      // 光球浮动 + 旋转环
+      for (var i = 0; i < nodes.length; i++) {
+        var nd = nodes[i];
+        var isHover = hover === i;
+        var targetScale = isHover ? 1.55 : 1.0;
+        nd.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.15);
+        nd.rotation.y += dt * (isHover ? 1.4 : 0.4);
+        nd.position.y = nd.userData.baseY + Math.sin(time * 0.8 + i) * 0.25;
+        nd.children[0].rotation.z += dt * 1.2;
+      }
+      // 连线透明度随 hover
+      lines.material.opacity = hover >= 0 ? 0.6 : 0.35;
+
+      // 悬停标签
+      if (hover >= 0) {
+        var nd = nodes[hover];
+        var v = nd.position.clone().applyMatrix4(group.matrixWorld);
+        v.project(camera);
+        var sx = (v.x * 0.5 + 0.5) * innerWidth;
+        var sy = (-v.y * 0.5 + 0.5) * innerHeight;
+        tip.style.left = sx + "px";
+        tip.style.top = (sy - 26) + "px";
+        tip.textContent = "点击进入 · " + SECTION_ORDER[hover];
+        tip.classList.add("is-on");
+      } else {
+        tip.classList.remove("is-on");
+      }
+
+      // 光标
+      cursor.style.transform = "translate(" + curX + "px," + curY + "px)";
+      cursor.classList.toggle("is-hover", hover >= 0);
+
+      // 悬停检测（用上一帧 mouse）
+      raycaster.setFromCamera(mouse, camera);
+      var hits = raycaster.intersectObjects(nodes, false);
+      hover = hits.length ? hits[0].object.userData.idx : -1;
+
+      renderer.render(scene, camera);
+    }
+
+    // ---------- 自适应 ----------
+    window.addEventListener("resize", function () {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+      renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+    });
+
+    // ---------- 头部背景滚动态 ----------
+    var head = document.getElementById("siteHead");
+    window.addEventListener("scroll", function () {
+      head.classList.toggle("is-scrolled", window.scrollY > 30);
+    }, { passive: true });
+
+    // ---------- 渐显 ----------
+    var fadeIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("on"); fadeIO.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    document.querySelectorAll(".fade").forEach(function (el) { fadeIO.observe(el); });
+
+    // ---------- 启动 ----------
+    setActive("hero");
+    animate();
+    setTimeout(function () { document.getElementById("loader").classList.add("is-done"); }, 700);
+  })();
+  </script>
+</body>
+</html>
