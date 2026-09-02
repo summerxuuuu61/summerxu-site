@@ -5,7 +5,7 @@
   var scene, camera, renderer, sphere, markers = [], adminLines = [];
   var radius = R * 2.7, theta = 0.2, phi = 1.35;
   var tgt = new THREE.Vector3(0, 0, 0);
-  var dragging = false, lastX = 0, lastY = 0, hover = -1, prevIdx = -1;
+  var dragging = false, lastX = 0, lastY = 0, hover = -1, prevIdx = -1, axisLock = null, isTouch = false;
   var downMarker = -1, moved = false, downX = 0, downY = 0;
   var goal = null, zoomGoal = null;
   var T = 0;
@@ -145,11 +145,23 @@
     for (var i = 0; i < markers.length; i++) { if (ray.intersectObject(markers[i].spr).length) return i; }
     return -1;
   }
-  function onDown(e) { dragging = true; moved = false; downX = e.clientX; downY = e.clientY; lastX = e.clientX; lastY = e.clientY; downMarker = pick(e); }
+  function onDown(e) { dragging = true; moved = false; isTouch = e.pointerType === "touch"; axisLock = null; downX = e.clientX; downY = e.clientY; lastX = e.clientX; lastY = e.clientY; downMarker = pick(e); }
   function onMove(e) {
     var i = pick(e);
     if (i !== hover) { setHover(i); }
-    if (dragging) { if (Math.hypot(e.clientX - downX, e.clientY - downY) > 6) moved = true; theta -= (e.clientX - lastX) * 0.004; phi -= (e.clientY - lastY) * 0.004; phi = Math.max(0.15, Math.min(Math.PI - 0.15, phi)); goal = null; lastX = e.clientX; lastY = e.clientY; }
+    if (!dragging) return;
+    if (isTouch && axisLock === null) {
+      var ax = e.clientX - downX, ay = e.clientY - downY;
+      if (Math.hypot(ax, ay) > 10) axisLock = Math.abs(ay) > Math.abs(ax) ? "scroll" : "rotate";
+    }
+    if (axisLock === "scroll") {
+      var dy = e.clientY - lastY;
+      window.scrollBy(0, -dy);
+      lastX = e.clientX; lastY = e.clientY; moved = true;
+      return;
+    }
+    if (Math.hypot(e.clientX - downX, e.clientY - downY) > 6) moved = true;
+    theta -= (e.clientX - lastX) * 0.004; phi -= (e.clientY - lastY) * 0.004; phi = Math.max(0.15, Math.min(Math.PI - 0.15, phi)); goal = null; lastX = e.clientX; lastY = e.clientY;
   }
   function setHover(i) {
     if (i >= 0 && markers[i]) setAdminGlow(markers[i].admin, true);
@@ -161,7 +173,7 @@
       else if (m.label) m.label.visible = false;
     });
   }
-  function onUp() { dragging = false; if (!moved && downMarker >= 0 && markers[downMarker]) openPlace(markers[downMarker]); downMarker = -1; }
+  function onUp() { dragging = false; axisLock = null; if (!moved && downMarker >= 0 && markers[downMarker]) openPlace(markers[downMarker]); downMarker = -1; }
   function onDbl(e) { var i = pick(e); if (i >= 0) openPlace(markers[i]); }
   function onWheel(e) { if (e.ctrlKey) { e.preventDefault(); zoomGoal = Math.max(R * 1.55, Math.min(R * 6, radius * (e.deltaY > 0 ? 1.12 : 0.89))); } }
   var pinchStart = 0, pinchRadius = 0;
