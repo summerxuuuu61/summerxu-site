@@ -200,6 +200,8 @@
       camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
       renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      canvas.style.touchAction = "none";
+      canvas.style.overscrollBehavior = "none";
       function size() { var w = canvas.clientWidth || window.innerWidth, h = canvas.clientHeight || window.innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
       size(); window.addEventListener("resize", size);
       buildSphere(); buildAdmin1(); buildStars(); buildMarkers(list); updateCam();
