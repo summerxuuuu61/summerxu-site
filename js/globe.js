@@ -164,6 +164,25 @@
   function onUp() { dragging = false; if (!moved && downMarker >= 0 && markers[downMarker]) openPlace(markers[downMarker]); downMarker = -1; }
   function onDbl(e) { var i = pick(e); if (i >= 0) openPlace(markers[i]); }
   function onWheel(e) { if (e.ctrlKey) { e.preventDefault(); zoomGoal = Math.max(R * 1.55, Math.min(R * 6, radius * (e.deltaY > 0 ? 1.12 : 0.89))); } }
+  var pinchStart = 0, pinchRadius = 0;
+  function onTouchStart(e) {
+    if (e.touches.length === 2) {
+      var dx = e.touches[0].clientX - e.touches[1].clientX;
+      var dy = e.touches[0].clientY - e.touches[1].clientY;
+      pinchStart = Math.hypot(dx, dy) || 1;
+      pinchRadius = radius;
+    }
+  }
+  function onTouchMove(e) {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      var dx = e.touches[0].clientX - e.touches[1].clientX;
+      var dy = e.touches[0].clientY - e.touches[1].clientY;
+      var dist = Math.hypot(dx, dy);
+      if (pinchStart > 0 && dist > 0) zoomGoal = Math.max(R * 1.55, Math.min(R * 6, pinchRadius * (pinchStart / dist)));
+    }
+  }
+  function onTouchEnd(e) { if (e.touches.length < 2) pinchStart = 0; }
   function tick() {
     requestAnimationFrame(tick);
     T += 16;
@@ -200,7 +219,7 @@
       camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
       renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-      canvas.style.touchAction = "none";
+      canvas.style.touchAction = "pan-y";
       canvas.style.overscrollBehavior = "none";
       function size() { var w = canvas.clientWidth || window.innerWidth, h = canvas.clientHeight || window.innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
       size(); window.addEventListener("resize", size);
@@ -208,8 +227,12 @@
       canvas.addEventListener("pointerdown", onDown);
       canvas.addEventListener("pointermove", onMove);
       window.addEventListener("pointerup", onUp);
+      canvas.addEventListener("pointercancel", function () { dragging = false; });
       canvas.addEventListener("wheel", onWheel, { passive: false });
       canvas.addEventListener("dblclick", onDbl);
+      canvas.addEventListener("touchstart", onTouchStart, { passive: false });
+      canvas.addEventListener("touchmove", onTouchMove, { passive: false });
+      canvas.addEventListener("touchend", onTouchEnd);
       tick();
       var p = document.getElementById("globePanel"); if (p) p.hidden = true;
     }
